@@ -1,0 +1,10 @@
+syntax: glob
+ProductHunt-client.iml
+gradlew
+gradlew.bat
+local.properties
+build
+gradle
+.idea
+.gradle
+app/app.iml
