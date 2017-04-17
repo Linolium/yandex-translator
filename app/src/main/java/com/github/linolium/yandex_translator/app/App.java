@@ -7,6 +7,9 @@ import com.github.linolium.yandex_translator.di.components.AppComponent;
 import com.github.linolium.yandex_translator.di.components.DaggerAppComponent;
 import com.github.linolium.yandex_translator.di.modules.AppModule;
 
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
+
 /**
  * Created by Linolium on 07.04.2017.
  */
@@ -23,6 +26,11 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         buildObjectGraphAndInject();
+        Realm.init(this);
+        RealmConfiguration config = new RealmConfiguration.Builder()
+                .deleteRealmIfMigrationNeeded()
+                .build();
+        Realm.setDefaultConfiguration(config);
     }
 
     public void buildObjectGraphAndInject() {
