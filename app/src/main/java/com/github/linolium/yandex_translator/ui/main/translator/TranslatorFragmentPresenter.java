@@ -1,11 +1,11 @@
 package com.github.linolium.yandex_translator.ui.main.translator;
 
 import android.content.SharedPreferences;
-import okhttp3.Cache;
+
+import io.realm.Realm;
 
 import com.github.linolium.yandex_translator.app.BaseFragmentPresenter;
 import com.github.linolium.yandex_translator.common.eventbus.Bus;
-import com.github.linolium.yandex_translator.domain.Lang;
 import com.github.linolium.yandex_translator.network.NetworkService;
 
 import rx.Subscription;
@@ -15,6 +15,8 @@ import rx.Subscription;
  */
 
 public interface TranslatorFragmentPresenter extends BaseFragmentPresenter<TranslatorFragmentView> {
-    Subscription subscribeToBus(Bus bus);
-    void updateLangs(SharedPreferences preferences, Bus bus, NetworkService service, Cache cache);
+    Subscription subscribeToBus(Bus bus, SharedPreferences preferences);
+    void loadLangs(NetworkService networkService, Bus bus, SharedPreferences preferences);
+    void loadTranslatedList(NetworkService networkService, Bus bus, String lang, String text);
+    void setDefaultLangs(String spinnerConfig, int pos, SharedPreferences preferences);
 }

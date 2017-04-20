@@ -2,6 +2,7 @@ package com.github.linolium.yandex_translator.ui.main.translator;
 
 import com.github.linolium.yandex_translator.common.MessageType;
 import com.github.linolium.yandex_translator.domain.Lang;
+import com.github.linolium.yandex_translator.domain.TranslateText;
 
 import java.util.List;
 
@@ -13,5 +14,6 @@ public interface TranslatorFragmentView {
     void showProgress();
     void hideProgress();
     void showMessage(int message, @MessageType int type);
-    void updateLangs(List<Lang> langList);
+    void updateSpinners(List<Lang> langs);
+    void updateRecyclerView(List<TranslateText> textList);
 }

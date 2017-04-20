@@ -15,16 +15,20 @@ import com.google.gson.Gson;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import io.realm.Realm;
+
 /**
  * Created by Linolium on 07.04.2017.
  */
 
 public class BaseFragment extends Fragment {
 
-//    @Inject
-//    public Gson gson;
+    @Inject
+    public Gson gson;
     @Inject
     public Bus bus;
+//    @Inject
+//    public Realm realm;
     @Inject
     public SharedPreferences preferences;
     @Inject @Named("no_cached")

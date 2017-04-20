@@ -16,8 +16,15 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-@RequiredArgsConstructor
 public class Lang extends RealmObject implements Serializable {
     private String key;
     private String value;
+
+    public Lang(String key, String value) {
+        this.key = key;
+        this.value = value;
+    }
+
+    public Lang() {
+    }
 }

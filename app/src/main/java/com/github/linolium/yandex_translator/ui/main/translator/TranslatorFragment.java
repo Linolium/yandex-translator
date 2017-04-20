@@ -2,16 +2,20 @@ package com.github.linolium.yandex_translator.ui.main.translator;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 
@@ -20,18 +24,20 @@ import com.github.linolium.yandex_translator.app.BaseFragment;
 import com.github.linolium.yandex_translator.common.Config;
 import com.github.linolium.yandex_translator.common.MessageType;
 import com.github.linolium.yandex_translator.common.adapters.LangAdapter;
+import com.github.linolium.yandex_translator.common.adapters.TranslateTextAdapter;
 import com.github.linolium.yandex_translator.di.components.MainComponent;
 import com.github.linolium.yandex_translator.domain.Lang;
-import com.google.gson.reflect.TypeToken;
-import com.jakewharton.rxbinding.widget.RxAdapter;
-import com.jakewharton.rxbinding.widget.RxAdapterView;
+import com.github.linolium.yandex_translator.domain.TranslateText;
+import com.jakewharton.rxbinding.view.RxView;
 
 import java.util.List;
 
 import javax.inject.Inject;
 
 import okhttp3.Cache;
+import rx.Observable;
 import rx.Subscription;
+import rx.subscriptions.CompositeSubscription;
 
 
 /**
@@ -45,20 +51,26 @@ public class TranslatorFragment extends BaseFragment implements TranslatorFragme
     private Subscription eventSubscription;
 
     private LangAdapter langAdapter;
-    private List<Lang> langs;
+    private TranslateTextAdapter textAdapter;
     private Activity activity;
-    private Toolbar toolbar;
+    private Spinner fromLang;
+    private ImageButton switchLangButton;
+    private Spinner toLang;
+    private EditText enterTextArea;
+    private RecyclerView recyclerView;
+
+    private Observable<Boolean> isEmptyArea;
+    private CompositeSubscription subscriptions;
+
 
     @Inject
     TranslatorFragmentPresenter presenter;
     @Inject
     Cache cache;
 
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
@@ -71,7 +83,8 @@ public class TranslatorFragment extends BaseFragment implements TranslatorFragme
     public void onResume() {
         super.onResume();
         presenter.init(this);
-        eventSubscription = presenter.subscribeToBus(bus);
+        eventSubscription = presenter.subscribeToBus(bus, preferences);
+        presenter.loadLangs(networkService, bus, preferences);
     }
 
     @Override
@@ -92,30 +105,80 @@ public class TranslatorFragment extends BaseFragment implements TranslatorFragme
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_translator, container, false);
 
-        // toolbar
-        toolbar = (Toolbar) view.findViewById(R.id.toolbar);
-        ((AppCompatActivity) activity).setSupportActionBar(toolbar);
-        ActionBar actionBar = ((AppCompatActivity) activity).getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(false);
-            actionBar.setDisplayShowHomeEnabled(false);
-            actionBar.setTitle("");
-        }
-
         progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
+        fromLang = (Spinner) view.findViewById(R.id.from_lang);
+        switchLangButton = (ImageButton) view.findViewById(R.id.switchLangButton);
+        toLang = (Spinner) view.findViewById(R.id.to_lang);
+        enterTextArea = (EditText) view.findViewById(R.id.translateEditText);
 
-        Spinner spinner = (Spinner) view.findViewById(R.id.toolbar_spinner);
+        RxView.clicks(switchLangButton).subscribe(aVoid -> {
+            int tempPos = fromLang.getSelectedItemPosition();
+            fromLang.setSelection(toLang.getSelectedItemPosition());
+            toLang.setSelection(tempPos);
+            presenter.setDefaultLangs(Config.FROM_LANG_POS, fromLang.getSelectedItemPosition(), preferences);
+            presenter.setDefaultLangs(Config.TO_LANG_POS, toLang.getSelectedItemPosition(), preferences);
+            if (enterTextArea.getText().length() > 0) {
+                presenter.loadTranslatedList(
+                        networkService,
+                        bus,
+                        ((Lang)fromLang.getSelectedItem()).getKey() + "-" + ((Lang)toLang.getSelectedItem()).getKey(),
+                        enterTextArea.getText().toString());
+            }
+        });
 
-        langAdapter = new LangAdapter(activity, langs);
-        spinner.setAdapter(langAdapter);
-        RxAdapterView.itemSelections(spinner)
-                .filter(integer -> langAdapter.getCount() != 0)
-                .subscribe(integer -> {
-                    Lang lang = langAdapter.getItem(integer);
-                    presenter.updateLangs(preferences, bus,
-                            cachedNetworkService, cache);
-                    getActivity().invalidateOptionsMenu();
-                });
+        recyclerView = (RecyclerView) view.findViewById(R.id.rvTranslate);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+
+        enterTextArea.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if (enterTextArea.getText().length() > 0) {
+                    presenter.loadTranslatedList(
+                            networkService,
+                            bus,
+                            ((Lang)fromLang.getSelectedItem()).getKey() + "-" + ((Lang)toLang.getSelectedItem()).getKey(),
+                            enterTextArea.getText().toString());
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
+        fromLang.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                presenter.setDefaultLangs(Config.FROM_LANG_POS, fromLang.getSelectedItemPosition(), preferences);
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        toLang.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                presenter.setDefaultLangs(Config.TO_LANG_POS, toLang.getSelectedItemPosition(), preferences);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+//        isEmptyArea = RxTextView.textChanges(enterTextArea).map(charSequence -> charSequence.length() > 0);
 
         return view;
     }
@@ -136,7 +199,18 @@ public class TranslatorFragment extends BaseFragment implements TranslatorFragme
     }
 
     @Override
-    public void updateLangs(List<Lang> langList) {
-        langs = langList;
+    public void updateSpinners(List<Lang> langs) {
+        langAdapter = new LangAdapter(activity, langs);
+        fromLang.setAdapter(langAdapter);
+        toLang.setAdapter(langAdapter);
+        fromLang.setSelection(preferences.getInt(Config.FROM_LANG_POS, 0));
+        toLang.setSelection(preferences.getInt(Config.TO_LANG_POS, 1));
+    }
+
+    @Override
+    public void updateRecyclerView(List<TranslateText> textList) {
+        textAdapter = new TranslateTextAdapter(textList, activity, bus);
+        recyclerView.setLayoutManager(new LinearLayoutManager(activity));
+        recyclerView.setAdapter(textAdapter);
     }
 }

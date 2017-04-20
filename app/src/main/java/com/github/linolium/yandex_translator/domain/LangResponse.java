@@ -1,6 +1,8 @@
 package com.github.linolium.yandex_translator.domain;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.List;
 
 import io.realm.RealmList;
 import io.realm.RealmObject;
@@ -18,10 +20,8 @@ import lombok.ToString;
 @Setter
 @ToString
 @RequiredArgsConstructor
-public class LangResponse extends RealmObject implements Serializable {
+public class LangResponse {
 
-    @PrimaryKey
-    private long id;
-
-    private RealmList<Lang> langs;
+    private List<String> dirs;
+    private HashMap<String, String> langs;
 }

@@ -139,10 +139,10 @@ public class AppModule {
             return chain.proceed(request);
         });
 
-        // logging для http клиента TODO закомментировать в продакшен
-        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-        builder.interceptors().add(interceptor);
+//        // logging для http клиента TODO закомментировать в продакшен
+//        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+//        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+//        builder.interceptors().add(interceptor);
 
         // устанавливаем кэш
         builder.cache(cache);
@@ -164,10 +164,10 @@ public class AppModule {
 
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
 
-        // logging для http клиента TODO закомментировать в продакшен
-        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-        builder.interceptors().add(interceptor);
+//        // logging для http клиента TODO закомментировать в продакшен
+//        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+//        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+//        builder.interceptors().add(interceptor);
 
         Retrofit retrofit = new Retrofit.Builder()
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())

@@ -27,16 +27,11 @@ public interface AppComponent {
     Application app();
 
     SharedPreferences sharedPreferences();
-
     Bus eventBus();
-
     Gson gson();
-
     Cache cache();
-
     @Named("cached")
     NetworkService mobukCachedService();
-
     @Named("no_cached")
     NetworkService mobukNoCachedService();
 

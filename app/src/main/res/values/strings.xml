@@ -4,4 +4,5 @@
     <string name="text_dictionary">Избранное</string>
     <string name="text_history">История</string>
     <string name="toast_error">Ошибка подключения к серверу. Проверьте настройки сети или повторите попытку позже.</string>
+    <string name="toast_successfully_added">Слово успешно добавлено в словарь</string>
 </resources>

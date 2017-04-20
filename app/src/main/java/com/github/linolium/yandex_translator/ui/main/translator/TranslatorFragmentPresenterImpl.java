@@ -2,23 +2,26 @@ package com.github.linolium.yandex_translator.ui.main.translator;
 
 import android.content.SharedPreferences;
 
-import okhttp3.Cache;
 import com.github.linolium.yandex_translator.R;
 import com.github.linolium.yandex_translator.common.Config;
 import com.github.linolium.yandex_translator.common.MessageType;
 import com.github.linolium.yandex_translator.common.eventbus.Bus;
 import com.github.linolium.yandex_translator.common.eventbus.events.HttpErrorEvent;
 import com.github.linolium.yandex_translator.common.eventbus.events.ThrowableEvent;
+import com.github.linolium.yandex_translator.common.eventbus.events.translator.FavouriteEvent;
 import com.github.linolium.yandex_translator.common.eventbus.events.translator.LoadLangsEvent;
+import com.github.linolium.yandex_translator.common.eventbus.events.translator.TranslateEvent;
 import com.github.linolium.yandex_translator.common.rx.RxUtil;
 import com.github.linolium.yandex_translator.domain.Lang;
 import com.github.linolium.yandex_translator.domain.LangResponse;
+import com.github.linolium.yandex_translator.domain.TranslateText;
+import com.github.linolium.yandex_translator.domain.TranslateTextResponse;
 import com.github.linolium.yandex_translator.network.NetworkService;
-import com.google.gson.Gson;
 
-import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -44,7 +47,7 @@ public class TranslatorFragmentPresenterImpl implements TranslatorFragmentPresen
     }
 
     @Override
-    public Subscription subscribeToBus(Bus bus) {
+    public Subscription subscribeToBus(Bus bus, SharedPreferences preferences) {
         return bus.observeOn(AndroidSchedulers.mainThread())
                 .subscribe(event -> {
                     view.hideProgress();
@@ -53,37 +56,78 @@ public class TranslatorFragmentPresenterImpl implements TranslatorFragmentPresen
                     } else if (event instanceof HttpErrorEvent) {
                         view.showMessage(R.string.toast_error, MessageType.ERROR);
                     } else if (event instanceof LoadLangsEvent) {
-                        final List<Lang> langs = ((LoadLangsEvent) event).getLangList();
-                        view.updateLangs(langs);
+                        view.hideProgress();
+                        final List<Lang> langList = ((LoadLangsEvent) event).getLangList();
+                        view.updateSpinners(langList);
+                    } else if (event instanceof TranslateEvent) {
+                        view.hideProgress();
+                        final List<TranslateText> textList = ((TranslateEvent) event).getTextList();
+                        view.updateRecyclerView(textList);
+                    } else if (event instanceof FavouriteEvent) {
+                        view.hideProgress();
+                        view.showMessage(R.string.toast_successfully_added, MessageType.INFO);
                     }
                 });
     }
 
     @Override
-    public void updateLangs(SharedPreferences preferences, Bus bus, NetworkService service, Cache cache) {
-        try {
-            view.showProgress();
-            cache.evictAll();
-
-            Observable<Response<LangResponse>> responseObservable = service.getLangs(Config.ACCESS_TOKEN, "ru");
-            responseObservable.compose(RxUtil.applySchedulersAndRetry())
-                    .subscribe(response -> {
-                        int responseCode = response.code();
-
-                        if (responseCode == HttpURLConnection.HTTP_OK) {
-                            LangResponse langResponse = response.body();
-
-                            bus.send(new LoadLangsEvent(langResponse.getLangs()));
+    public void loadLangs(NetworkService networkService, Bus bus, SharedPreferences preferences) {
+        view.showProgress();
+        Observable<Response<LangResponse>> responseObservable = networkService.getLangs(Config.API_KEY, "ru");
+        responseObservable.compose(RxUtil.applySchedulersAndRetry())
+                .subscribe(response -> {
+                   int responseCode = response.code();
+                    if (responseCode == HttpURLConnection.HTTP_OK) {
+                        LangResponse langResponse = response.body();
+                        List<Lang> langList = new ArrayList<>();
+                        for (Map.Entry<String, String> entry : langResponse.getLangs().entrySet()) {
+                            langList.add(new Lang(entry.getKey(), entry.getValue()));
                         }
-                    }, throwable -> {
-                        throwable.printStackTrace();
-                        bus.send(new ThrowableEvent(throwable));
-                    });
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            bus.send(new ThrowableEvent(ex.getCause()));
-        }
+
+                        final int fromPosition = preferences.getInt(Config.FROM_LANG_POS, -1);
+                        final int toPosition = preferences.getInt(Config.TO_LANG_POS, -1);
+
+                        if (fromPosition == -1 && toPosition == -1) {
+                            SharedPreferences.Editor editor = preferences.edit();
+                            editor.putInt(Config.FROM_LANG_POS, 47);
+                            editor.putInt(Config.TO_LANG_POS, 49);
+                            editor.apply();
+                        }
+                        bus.send(new LoadLangsEvent(langList));
+                    }
+                }, throwable -> {
+                    throwable.printStackTrace();
+                    bus.send(new ThrowableEvent(throwable));
+                });
+
     }
 
+    @Override
+    public void loadTranslatedList(NetworkService networkService, Bus bus, String lang, String text) {
+        view.showProgress();
+        Observable<Response<TranslateTextResponse>> responseObservable = networkService.translate(lang, Config.API_KEY, text);
+        responseObservable.compose(RxUtil.applySchedulersAndRetry())
+                .subscribe(response -> {
+                   int responseCode = response.code();
+                    if (responseCode == HttpURLConnection.HTTP_OK) {
+                        TranslateTextResponse textResponse = response.body();
+                        List<TranslateText> textList = new ArrayList<>();
+//                        textResponse.getText().forEach( translatedText -> textList.add(new TranslateText(translatedText)));
+                        for (String s : textResponse.getText()) {
+                            textList.add(new TranslateText(s));
+                        }
+                        bus.send(new TranslateEvent(textList));
+                    }
+                }, throwable -> {
+                    throwable.printStackTrace();
+                    bus.send(new ThrowableEvent(throwable));
+                });
+    }
 
+    @Override
+    public void setDefaultLangs(String spinnerConfig, int pos, SharedPreferences preferences) {
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt(spinnerConfig, pos);
+        editor.apply();
+    }
 }
