@@ -1,6 +1,7 @@
 package com.github.linolium.yandex_translator.ui.main;
 
 
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
@@ -14,6 +15,7 @@ import com.github.linolium.yandex_translator.di.components.DaggerMainComponent;
 import com.github.linolium.yandex_translator.di.components.MainComponent;
 import com.github.linolium.yandex_translator.di.modules.MainModule;
 import com.github.linolium.yandex_translator.ui.main.dictionary.DictionaryFragment;
+import com.github.linolium.yandex_translator.ui.main.history.HistoryFragment;
 import com.github.linolium.yandex_translator.ui.main.translator.TranslatorFragment;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnMenuTabClickListener;
@@ -28,8 +30,6 @@ public class MainActivity extends BaseActivity implements HasComponent<MainCompo
     private MainComponent component;
 
     private BottomBar bottomBar;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +47,10 @@ public class MainActivity extends BaseActivity implements HasComponent<MainCompo
                 }
                 if (menuItemId == R.id.action_dictionary) {
                     DictionaryFragment f = new DictionaryFragment();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.frame, f).commit();
+                }
+                if (menuItemId == R.id.action_history) {
+                    HistoryFragment f = new HistoryFragment();
                     getSupportFragmentManager().beginTransaction().replace(R.id.frame, f).commit();
                 }
             }
@@ -77,4 +81,13 @@ public class MainActivity extends BaseActivity implements HasComponent<MainCompo
     public MainComponent getComponent() {
         return component;
     }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        //todo переделать нормально если будет время
+        setContentView(R.layout.activity_main);
+    }
+
+
 }

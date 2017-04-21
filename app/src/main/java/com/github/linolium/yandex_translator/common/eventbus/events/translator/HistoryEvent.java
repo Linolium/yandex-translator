@@ -3,14 +3,14 @@ package com.github.linolium.yandex_translator.common.eventbus.events.translator;
 import com.github.linolium.yandex_translator.domain.TranslateText;
 
 /**
- * Created by linolium on 20.04.17.
+ * Created by Linolium on 21.04.2017.
  */
 
-public class FavouriteEvent {
+public class HistoryEvent {
 
     final private TranslateText translateText;
 
-    public FavouriteEvent(TranslateText translateText) {
+    public HistoryEvent(TranslateText translateText) {
         this.translateText = translateText;
     }
 

@@ -25,6 +25,8 @@ import com.github.linolium.yandex_translator.common.Config;
 import com.github.linolium.yandex_translator.common.MessageType;
 import com.github.linolium.yandex_translator.common.adapters.LangAdapter;
 import com.github.linolium.yandex_translator.common.adapters.TranslateTextAdapter;
+import com.github.linolium.yandex_translator.common.eventbus.events.translator.FavouriteEvent;
+import com.github.linolium.yandex_translator.common.eventbus.events.translator.HistoryEvent;
 import com.github.linolium.yandex_translator.di.components.MainComponent;
 import com.github.linolium.yandex_translator.domain.Lang;
 import com.github.linolium.yandex_translator.domain.TranslateText;
@@ -34,6 +36,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import io.realm.Realm;
 import okhttp3.Cache;
 import rx.Observable;
 import rx.Subscription;
@@ -58,6 +61,7 @@ public class TranslatorFragment extends BaseFragment implements TranslatorFragme
     private Spinner toLang;
     private EditText enterTextArea;
     private RecyclerView recyclerView;
+    private boolean isVerticalScreen;
 
     private Observable<Boolean> isEmptyArea;
     private CompositeSubscription subscriptions;
@@ -67,6 +71,7 @@ public class TranslatorFragment extends BaseFragment implements TranslatorFragme
     TranslatorFragmentPresenter presenter;
     @Inject
     Cache cache;
+    Realm realm;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -82,8 +87,9 @@ public class TranslatorFragment extends BaseFragment implements TranslatorFragme
     @Override
     public void onResume() {
         super.onResume();
+        realm = Realm.getDefaultInstance();
         presenter.init(this);
-        eventSubscription = presenter.subscribeToBus(bus, preferences);
+        eventSubscription = presenter.subscribeToBus(bus, preferences, realm);
         presenter.loadLangs(networkService, bus, preferences);
     }
 
@@ -104,7 +110,6 @@ public class TranslatorFragment extends BaseFragment implements TranslatorFragme
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_translator, container, false);
-
         progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
         fromLang = (Spinner) view.findViewById(R.id.from_lang);
         switchLangButton = (ImageButton) view.findViewById(R.id.switchLangButton);
@@ -157,7 +162,13 @@ public class TranslatorFragment extends BaseFragment implements TranslatorFragme
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 presenter.setDefaultLangs(Config.FROM_LANG_POS, fromLang.getSelectedItemPosition(), preferences);
-
+                if (enterTextArea.getText().length() > 0) {
+                    presenter.loadTranslatedList(
+                            networkService,
+                            bus,
+                            ((Lang)fromLang.getSelectedItem()).getKey() + "-" + ((Lang)toLang.getSelectedItem()).getKey(),
+                            enterTextArea.getText().toString());
+                }
             }
 
             @Override
@@ -170,6 +181,13 @@ public class TranslatorFragment extends BaseFragment implements TranslatorFragme
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 presenter.setDefaultLangs(Config.TO_LANG_POS, toLang.getSelectedItemPosition(), preferences);
+                if (enterTextArea.getText().length() > 0) {
+                    presenter.loadTranslatedList(
+                            networkService,
+                            bus,
+                            ((Lang)fromLang.getSelectedItem()).getKey() + "-" + ((Lang)toLang.getSelectedItem()).getKey(),
+                            enterTextArea.getText().toString());
+                }
             }
 
             @Override

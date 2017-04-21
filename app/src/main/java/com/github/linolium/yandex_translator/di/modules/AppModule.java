@@ -139,11 +139,6 @@ public class AppModule {
             return chain.proceed(request);
         });
 
-//        // logging для http клиента TODO закомментировать в продакшен
-//        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-//        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-//        builder.interceptors().add(interceptor);
-
         // устанавливаем кэш
         builder.cache(cache);
 
@@ -163,12 +158,6 @@ public class AppModule {
     NetworkService provideMobukService(Gson gson) {
 
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
-
-//        // logging для http клиента TODO закомментировать в продакшен
-//        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-//        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-//        builder.interceptors().add(interceptor);
-
         Retrofit retrofit = new Retrofit.Builder()
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create(gson))

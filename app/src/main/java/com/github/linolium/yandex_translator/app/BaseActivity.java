@@ -29,8 +29,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     public Gson gson;
     @Inject
     public Bus bus;
-//    @Inject
-//    public Realm realm;
     @Inject
     public SharedPreferences preferences;
     @Inject @Named("no_cached")

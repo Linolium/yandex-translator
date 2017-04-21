@@ -9,6 +9,7 @@ import com.github.linolium.yandex_translator.common.eventbus.Bus;
 import com.github.linolium.yandex_translator.common.eventbus.events.HttpErrorEvent;
 import com.github.linolium.yandex_translator.common.eventbus.events.ThrowableEvent;
 import com.github.linolium.yandex_translator.common.eventbus.events.translator.FavouriteEvent;
+import com.github.linolium.yandex_translator.common.eventbus.events.translator.HistoryEvent;
 import com.github.linolium.yandex_translator.common.eventbus.events.translator.LoadLangsEvent;
 import com.github.linolium.yandex_translator.common.eventbus.events.translator.TranslateEvent;
 import com.github.linolium.yandex_translator.common.rx.RxUtil;
@@ -25,6 +26,8 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import io.realm.Realm;
+import io.realm.RealmResults;
 import retrofit2.Response;
 import rx.Observable;
 import rx.Subscription;
@@ -38,6 +41,7 @@ public class TranslatorFragmentPresenterImpl implements TranslatorFragmentPresen
 
     private TranslatorFragmentView view;
 
+    @Override
     public void init(TranslatorFragmentView view) {
         this.view = view;
     }
@@ -47,7 +51,7 @@ public class TranslatorFragmentPresenterImpl implements TranslatorFragmentPresen
     }
 
     @Override
-    public Subscription subscribeToBus(Bus bus, SharedPreferences preferences) {
+    public Subscription subscribeToBus(Bus bus, SharedPreferences preferences, Realm realm) {
         return bus.observeOn(AndroidSchedulers.mainThread())
                 .subscribe(event -> {
                     view.hideProgress();
@@ -65,7 +69,23 @@ public class TranslatorFragmentPresenterImpl implements TranslatorFragmentPresen
                         view.updateRecyclerView(textList);
                     } else if (event instanceof FavouriteEvent) {
                         view.hideProgress();
+                        realm.beginTransaction();
+                        TranslateText translateText = realm.createObject(TranslateText.class, TranslateText.getNextKey(realm));
+                        translateText.setEnteredText(((FavouriteEvent) event).getTranslateText().getEnteredText());
+                        translateText.setTranslatedText(((FavouriteEvent) event).getTranslateText().getTranslatedText());
+                        translateText.setFromToCode(((FavouriteEvent) event).getTranslateText().getFromToCode().toUpperCase());
+                        translateText.setFavourite(true);
+                        realm.commitTransaction();
                         view.showMessage(R.string.toast_successfully_added, MessageType.INFO);
+                    } else if (event instanceof HistoryEvent) {
+                        view.hideProgress();
+                        realm.beginTransaction();
+                        TranslateText translateText = realm.createObject(TranslateText.class, TranslateText.getNextKey(realm));
+                        translateText.setEnteredText(((HistoryEvent) event).getTranslateText().getEnteredText());
+                        translateText.setTranslatedText(((HistoryEvent) event).getTranslateText().getTranslatedText());
+                        translateText.setFromToCode(((HistoryEvent) event).getTranslateText().getFromToCode().toUpperCase());
+                        translateText.setFavourite(false);
+                        realm.commitTransaction();
                     }
                 });
     }
@@ -112,9 +132,9 @@ public class TranslatorFragmentPresenterImpl implements TranslatorFragmentPresen
                     if (responseCode == HttpURLConnection.HTTP_OK) {
                         TranslateTextResponse textResponse = response.body();
                         List<TranslateText> textList = new ArrayList<>();
-//                        textResponse.getText().forEach( translatedText -> textList.add(new TranslateText(translatedText)));
-                        for (String s : textResponse.getText()) {
-                            textList.add(new TranslateText(s));
+//                        textResponse.getTranslatedText().forEach( translatedText -> textList.add(new TranslateText(translatedText)));
+                        for (String translatedText : textResponse.getText()) {
+                            textList.add(new TranslateText(translatedText, text, lang));
                         }
                         bus.send(new TranslateEvent(textList));
                     }

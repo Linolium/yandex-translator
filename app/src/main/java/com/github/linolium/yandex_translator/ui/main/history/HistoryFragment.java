@@ -1,4 +1,4 @@
-package com.github.linolium.yandex_translator.ui.main.dictionary;
+package com.github.linolium.yandex_translator.ui.main.history;
 
 import android.app.Activity;
 import android.content.Context;
@@ -29,22 +29,20 @@ import io.realm.Realm;
 import rx.Subscription;
 
 /**
- * Created by Linolium on 11.04.2017.
+ * Created by Linolium on 21.04.2017.
  */
 
-public class DictionaryFragment extends BaseFragment implements DictionaryFragmentView {
+public class HistoryFragment extends BaseFragment implements HistoryFragmentView {
 
+    @Inject
+    HistoryFragmentPresenter presenter;
+    Realm realm;
     private ProgressBar progressBar;
     private Subscription eventSubscription;
     private Activity activity;
     private RecyclerView recyclerView;
     private SavedTextAdapter savedTextAdapter;
     private SearchView searchView;
-
-
-    @Inject
-    DictionaryFragmentPresenter presenter;
-    Realm realm;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -63,7 +61,7 @@ public class DictionaryFragment extends BaseFragment implements DictionaryFragme
         realm = Realm.getDefaultInstance();
         presenter.init(this);
         eventSubscription = presenter.subscribeToBus(bus, preferences, realm);
-        presenter.getSavedTexts(bus, realm);
+        presenter.getHistoryTexts(bus, realm);
     }
 
     @Override
@@ -82,25 +80,13 @@ public class DictionaryFragment extends BaseFragment implements DictionaryFragme
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_dictionary, container, false);
+        View view = inflater.inflate(R.layout.fragment_history, container, false);
         progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
         searchView = (SearchView) view.findViewById(R.id.searchView);
         recyclerView = (RecyclerView) view.findViewById(R.id.rvSavedTexts);
         recyclerView.addItemDecoration(new DividerItemDecoration(activity, DividerItemDecoration.VERTICAL));
         recyclerView.setHasFixedSize(true);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String s) {
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String s) {
-                savedTextAdapter.filterList(s);
-                return false;
-            }
-        });
         return view;
     }
 
@@ -120,7 +106,7 @@ public class DictionaryFragment extends BaseFragment implements DictionaryFragme
     }
 
     @Override
-    public void getTranslatedTexts(List<TranslateText> translateTexts) {
+    public void getHistoryTexts(List<TranslateText> translateTexts) {
         savedTextAdapter = new SavedTextAdapter(translateTexts, activity, bus);
         recyclerView.setLayoutManager(new LinearLayoutManager(activity));
         recyclerView.setAdapter(savedTextAdapter);

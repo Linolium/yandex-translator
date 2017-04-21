@@ -27,8 +27,6 @@ public class BaseFragment extends Fragment {
     public Gson gson;
     @Inject
     public Bus bus;
-//    @Inject
-//    public Realm realm;
     @Inject
     public SharedPreferences preferences;
     @Inject @Named("no_cached")
