@@ -28,7 +28,6 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import io.realm.Realm;
-import io.realm.RealmResults;
 import retrofit2.Response;
 import rx.Observable;
 import rx.Subscription;

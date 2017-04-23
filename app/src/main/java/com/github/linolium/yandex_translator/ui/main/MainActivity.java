@@ -98,8 +98,6 @@ public class MainActivity extends BaseActivity implements HasComponent<MainCompo
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        //todo переделать нормально если будет время
-//        setContentView(R.layout.activity_main);
     }
 
 

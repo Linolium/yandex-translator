@@ -6,7 +6,6 @@ import com.github.linolium.yandex_translator.app.BaseFragmentPresenter;
 import com.github.linolium.yandex_translator.common.eventbus.Bus;
 import com.github.linolium.yandex_translator.domain.TranslateText;
 
-import java.util.List;
 
 import io.realm.Realm;
 import rx.Subscription;
