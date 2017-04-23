@@ -110,7 +110,7 @@ public class TranslatorFragment extends BaseFragment implements TranslatorFragme
         toLang = (Spinner) view.findViewById(R.id.to_lang);
         enterTextArea = (EditText) view.findViewById(R.id.translateEditText);
 
-
+        enterTextArea.setEnabled(false);
         RxView.clicks(switchLangButton).subscribe(aVoid -> {
             int tempPos = fromLang.getSelectedItemPosition();
             fromLang.setSelection(toLang.getSelectedItemPosition());
@@ -138,12 +138,14 @@ public class TranslatorFragment extends BaseFragment implements TranslatorFragme
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if (enterTextArea.getText().length() > 0) {
-                    presenter.loadTranslatedList(
-                            networkService,
-                            bus,
-                            ((Lang)fromLang.getSelectedItem()).getKey() + "-" + ((Lang)toLang.getSelectedItem()).getKey(),
-                            enterTextArea.getText().toString());
+                if (fromLang.getSelectedItem() != null && toLang.getSelectedItem() != null) {
+                    if (enterTextArea.getText().length() > 0) {
+                        presenter.loadTranslatedList(
+                                networkService,
+                                bus,
+                                ((Lang)fromLang.getSelectedItem()).getKey() + "-" + ((Lang)toLang.getSelectedItem()).getKey(),
+                                enterTextArea.getText().toString());
+                    }
                 }
             }
 
@@ -221,6 +223,7 @@ public class TranslatorFragment extends BaseFragment implements TranslatorFragme
         toLang.setAdapter(langAdapter);
         fromLang.setSelection(preferences.getInt(Config.FROM_LANG_POS, 0));
         toLang.setSelection(preferences.getInt(Config.TO_LANG_POS, 1));
+        enterTextArea.setEnabled(true);
     }
 
     @Override
