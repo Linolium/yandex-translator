@@ -5,6 +5,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.Toolbar;
 
 import com.github.linolium.yandex_translator.R;
@@ -43,15 +44,27 @@ public class MainActivity extends BaseActivity implements HasComponent<MainCompo
             public void onMenuTabSelected(@IdRes int menuItemId) {
                 if (menuItemId == R.id.action_translate) {
                     TranslatorFragment f = new TranslatorFragment();
-                    getSupportFragmentManager().beginTransaction().replace(R.id.frame, f).commit();
+                    getSupportFragmentManager()
+                            .beginTransaction()
+                            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                            .replace(R.id.frame, f)
+                            .commit();
                 }
                 if (menuItemId == R.id.action_dictionary) {
                     DictionaryFragment f = new DictionaryFragment();
-                    getSupportFragmentManager().beginTransaction().replace(R.id.frame, f).commit();
+                    getSupportFragmentManager()
+                            .beginTransaction()
+                            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                            .replace(R.id.frame, f)
+                            .commit();
                 }
                 if (menuItemId == R.id.action_history) {
                     HistoryFragment f = new HistoryFragment();
-                    getSupportFragmentManager().beginTransaction().replace(R.id.frame, f).commit();
+                    getSupportFragmentManager()
+                            .beginTransaction()
+                            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                            .replace(R.id.frame, f)
+                            .commit();
                 }
             }
 
@@ -86,7 +99,7 @@ public class MainActivity extends BaseActivity implements HasComponent<MainCompo
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         //todo переделать нормально если будет время
-        setContentView(R.layout.activity_main);
+//        setContentView(R.layout.activity_main);
     }
 
 

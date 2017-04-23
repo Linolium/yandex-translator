@@ -18,13 +18,33 @@
             android:background="?attr/colorPrimary"
             app:popupTheme="@style/AppTheme.PopupOverlay">
 
-            <SearchView android:id="@+id/searchView"
-                android:layout_width="fill_parent"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="10dip"
-                android:textSize="16dip"
-                android:textStyle="bold"
-                android:queryHint="@string/search_hint_favourite"/>
+                android:orientation="horizontal">
+
+                <SearchView android:id="@+id/searchView"
+                    android:layout_width="0dp"
+                    android:layout_weight=".80"
+                    android:layout_height="wrap_content"
+                    android:iconifiedByDefault="false"
+                    android:textSize="10sp"
+                    android:queryHint="@string/search_hint_favourite"
+                    android:searchIcon="@drawable/ic_search_black_24dp"
+                    android:queryBackground="@color/colorPrimary"
+                    android:closeIcon="@drawable/ic_clear_black_24dp"/>
+
+                <ImageButton
+                    android:id="@+id/clearButton"
+                    android:layout_width="0dp"
+                    android:layout_weight="0.20"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_delete_black_24dp"
+                    android:background="@null"
+                    />
+            </LinearLayout>
+
+
 
         </android.support.v7.widget.Toolbar>
 

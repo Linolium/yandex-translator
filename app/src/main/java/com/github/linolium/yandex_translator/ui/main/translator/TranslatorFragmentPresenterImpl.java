@@ -1,6 +1,7 @@
 package com.github.linolium.yandex_translator.ui.main.translator;
 
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.github.linolium.yandex_translator.R;
 import com.github.linolium.yandex_translator.common.Config;
@@ -68,24 +69,21 @@ public class TranslatorFragmentPresenterImpl implements TranslatorFragmentPresen
                         final List<TranslateText> textList = ((TranslateEvent) event).getTextList();
                         view.updateRecyclerView(textList);
                     } else if (event instanceof FavouriteEvent) {
-                        view.hideProgress();
-                        realm.beginTransaction();
-                        TranslateText translateText = realm.createObject(TranslateText.class, TranslateText.getNextKey(realm));
-                        translateText.setEnteredText(((FavouriteEvent) event).getTranslateText().getEnteredText());
-                        translateText.setTranslatedText(((FavouriteEvent) event).getTranslateText().getTranslatedText());
-                        translateText.setFromToCode(((FavouriteEvent) event).getTranslateText().getFromToCode().toUpperCase());
-                        translateText.setFavourite(true);
-                        realm.commitTransaction();
-                        view.showMessage(R.string.toast_successfully_added, MessageType.INFO);
+                        realm.executeTransaction(transaction -> {
+                            TranslateText translateText = ((FavouriteEvent) event).getTranslateText();
+                            if (transaction.where(TranslateText.class).equalTo("enteredText", translateText.getEnteredText()).findFirst() == null) {
+                                translateText.setId(TranslateText.getNextKey(realm));
+                                translateText.setFavourite(true);
+                                translateText.setFromToCode(translateText.getFromToCode().toUpperCase());
+                                transaction.copyToRealm(translateText);
+                                view.showMessage(R.string.toast_successfully_added, MessageType.INFO);
+                            } else {
+                                view.clearEditText();
+                                view.showMessage(R.string.wordIsAlreadyExists, MessageType.ERROR);
+                            }
+                        });
                     } else if (event instanceof HistoryEvent) {
                         view.hideProgress();
-                        realm.beginTransaction();
-                        TranslateText translateText = realm.createObject(TranslateText.class, TranslateText.getNextKey(realm));
-                        translateText.setEnteredText(((HistoryEvent) event).getTranslateText().getEnteredText());
-                        translateText.setTranslatedText(((HistoryEvent) event).getTranslateText().getTranslatedText());
-                        translateText.setFromToCode(((HistoryEvent) event).getTranslateText().getFromToCode().toUpperCase());
-                        translateText.setFavourite(false);
-                        realm.commitTransaction();
                     }
                 });
     }
@@ -149,5 +147,16 @@ public class TranslatorFragmentPresenterImpl implements TranslatorFragmentPresen
         SharedPreferences.Editor editor = preferences.edit();
         editor.putInt(spinnerConfig, pos);
         editor.apply();
+    }
+
+    @Override
+    public void updateHistory(Bus bus, Realm realm, TranslateText translateText) {
+        realm.executeTransaction(transaction -> {
+            translateText.setId(TranslateText.getNextKey(realm));
+            translateText.setFavourite(false);
+            translateText.setFromToCode(translateText.getFromToCode().toUpperCase());
+            transaction.copyToRealm(translateText);
+            bus.send(new HistoryEvent(translateText));
+        });
     }
 }

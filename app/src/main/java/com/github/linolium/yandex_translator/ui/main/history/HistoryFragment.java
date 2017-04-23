@@ -2,6 +2,7 @@ package com.github.linolium.yandex_translator.ui.main.history;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -11,8 +12,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
+import android.widget.TextView;
 
 import com.github.linolium.yandex_translator.R;
 import com.github.linolium.yandex_translator.app.BaseFragment;
@@ -20,12 +23,14 @@ import com.github.linolium.yandex_translator.common.MessageType;
 import com.github.linolium.yandex_translator.common.adapters.SavedTextAdapter;
 import com.github.linolium.yandex_translator.di.components.MainComponent;
 import com.github.linolium.yandex_translator.domain.TranslateText;
+import com.jakewharton.rxbinding.view.RxView;
 
 import java.util.List;
 
 import javax.inject.Inject;
 
 import io.realm.Realm;
+import io.realm.RealmResults;
 import rx.Subscription;
 
 /**
@@ -43,6 +48,7 @@ public class HistoryFragment extends BaseFragment implements HistoryFragmentView
     private RecyclerView recyclerView;
     private SavedTextAdapter savedTextAdapter;
     private SearchView searchView;
+    private ImageButton clearButton;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -68,6 +74,7 @@ public class HistoryFragment extends BaseFragment implements HistoryFragmentView
     public void onPause() {
         if (eventSubscription != null && !eventSubscription.isUnsubscribed())
             eventSubscription.unsubscribe();
+//        if (realm != null) realm.close();
         super.onPause();
     }
 
@@ -83,10 +90,36 @@ public class HistoryFragment extends BaseFragment implements HistoryFragmentView
         View view = inflater.inflate(R.layout.fragment_history, container, false);
         progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
         searchView = (SearchView) view.findViewById(R.id.searchView);
+        clearButton = (ImageButton) view.findViewById(R.id.clearButton);
+        RxView.clicks(clearButton).subscribe(aVoid -> {
+            presenter.clearHistory(realm);
+        });
+
+        // необходимо для смены цвета текста в searchView
+        int id = searchView.getContext()
+                .getResources()
+                .getIdentifier("android:id/search_src_text", null, null);
+        TextView textView = (TextView) searchView.findViewById(id);
+        textView.setTextColor(Color.BLACK);
+        textView.setHintTextColor(Color.BLACK);
+
+
         recyclerView = (RecyclerView) view.findViewById(R.id.rvSavedTexts);
         recyclerView.addItemDecoration(new DividerItemDecoration(activity, DividerItemDecoration.VERTICAL));
         recyclerView.setHasFixedSize(true);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                savedTextAdapter.filterList(s);
+                return false;
+            }
+        });
         return view;
     }
 
@@ -111,4 +144,6 @@ public class HistoryFragment extends BaseFragment implements HistoryFragmentView
         recyclerView.setLayoutManager(new LinearLayoutManager(activity));
         recyclerView.setAdapter(savedTextAdapter);
     }
+
+
 }

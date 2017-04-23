@@ -2,6 +2,7 @@ package com.github.linolium.yandex_translator.ui.main.dictionary;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -11,8 +12,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
+import android.widget.TextView;
 
 import com.github.linolium.yandex_translator.R;
 import com.github.linolium.yandex_translator.app.BaseFragment;
@@ -20,6 +23,7 @@ import com.github.linolium.yandex_translator.common.MessageType;
 import com.github.linolium.yandex_translator.common.adapters.SavedTextAdapter;
 import com.github.linolium.yandex_translator.di.components.MainComponent;
 import com.github.linolium.yandex_translator.domain.TranslateText;
+import com.jakewharton.rxbinding.view.RxView;
 
 import java.util.List;
 
@@ -40,6 +44,7 @@ public class DictionaryFragment extends BaseFragment implements DictionaryFragme
     private RecyclerView recyclerView;
     private SavedTextAdapter savedTextAdapter;
     private SearchView searchView;
+    private ImageButton clearButton;
 
 
     @Inject
@@ -70,6 +75,7 @@ public class DictionaryFragment extends BaseFragment implements DictionaryFragme
     public void onPause() {
         if (eventSubscription != null && !eventSubscription.isUnsubscribed())
             eventSubscription.unsubscribe();
+//        if (realm != null) realm.close();
         super.onPause();
     }
 
@@ -85,6 +91,19 @@ public class DictionaryFragment extends BaseFragment implements DictionaryFragme
         View view = inflater.inflate(R.layout.fragment_dictionary, container, false);
         progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
         searchView = (SearchView) view.findViewById(R.id.searchView);
+        clearButton = (ImageButton) view.findViewById(R.id.clearButton);
+        RxView.clicks(clearButton).subscribe(aVoid -> {
+            presenter.clearFavourite(realm);
+        });
+
+        // необходимо для смены цвета текста в searchView
+        int id = searchView.getContext()
+                .getResources()
+                .getIdentifier("android:id/search_src_text", null, null);
+        TextView textView = (TextView) searchView.findViewById(id);
+        textView.setTextColor(Color.BLACK);
+        textView.setHintTextColor(Color.BLACK);
+
         recyclerView = (RecyclerView) view.findViewById(R.id.rvSavedTexts);
         recyclerView.addItemDecoration(new DividerItemDecoration(activity, DividerItemDecoration.VERTICAL));
         recyclerView.setHasFixedSize(true);
@@ -97,7 +116,9 @@ public class DictionaryFragment extends BaseFragment implements DictionaryFragme
 
             @Override
             public boolean onQueryTextChange(String s) {
-                savedTextAdapter.filterList(s);
+                if (savedTextAdapter != null) {
+                    savedTextAdapter.filterList(s);
+                }
                 return false;
             }
         });

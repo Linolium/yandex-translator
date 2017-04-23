@@ -8,7 +8,7 @@ android {
     buildToolsVersion "25.0.2"
     defaultConfig {
         applicationId "com.github.linolium.yandex_translator"
-        minSdkVersion 16
+        minSdkVersion 21
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
@@ -35,7 +35,7 @@ dependencies {
     })
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support:design:25.3.1'
-//    compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
 
     //lombok
     provided "org.projectlombok:lombok:1.16.12"
@@ -48,7 +48,7 @@ dependencies {
 
     // rx
     compile 'io.reactivex:rxandroid:1.2.1'
-    compile 'io.reactivex:rxjava:1.1.6'
+    compile 'io.reactivex:rxjava:1.2.9'
 
     // rxbinding
     compile 'com.jakewharton.rxbinding:rxbinding:1.0.0'

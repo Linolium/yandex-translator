@@ -34,7 +34,7 @@ public class TranslatedTextFilter extends Filter {
 //            }
 //        });
         for (TranslateText item : textsList) {
-            if (item.getEnteredText().toLowerCase().trim().contains("pattern")) {
+            if (item.getEnteredText().toLowerCase().trim().contains(charSequence)) {
                 filteredTextsList.add(item);
             }
         }

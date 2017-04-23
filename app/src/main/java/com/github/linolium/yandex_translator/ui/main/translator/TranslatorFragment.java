@@ -97,6 +97,7 @@ public class TranslatorFragment extends BaseFragment implements TranslatorFragme
     public void onPause() {
         if (eventSubscription != null && !eventSubscription.isUnsubscribed())
             eventSubscription.unsubscribe();
+//        if (realm != null) realm.close();
         super.onPause();
     }
 
@@ -158,6 +159,12 @@ public class TranslatorFragment extends BaseFragment implements TranslatorFragme
             }
         });
 
+        enterTextArea.setOnFocusChangeListener((view1, hasFocus) -> {
+            if (!hasFocus && textAdapter != null) {
+                presenter.updateHistory(bus, realm, textAdapter.getItem(0));
+            }
+        });
+
         fromLang.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
@@ -196,7 +203,6 @@ public class TranslatorFragment extends BaseFragment implements TranslatorFragme
             }
         });
 
-//        isEmptyArea = RxTextView.textChanges(enterTextArea).map(charSequence -> charSequence.length() > 0);
 
         return view;
     }
@@ -230,5 +236,11 @@ public class TranslatorFragment extends BaseFragment implements TranslatorFragme
         textAdapter = new TranslateTextAdapter(textList, activity, bus);
         recyclerView.setLayoutManager(new LinearLayoutManager(activity));
         recyclerView.setAdapter(textAdapter);
+    }
+
+    @Override
+    public void clearEditText() {
+        enterTextArea.setText("");
+        recyclerView.setAdapter(null);
     }
 }

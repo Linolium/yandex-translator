@@ -56,10 +56,19 @@
 
     <EditText
         android:id="@+id/translateEditText"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="75dp"
-        style="@style/Widget.AppCompat.EditText" />
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:maxHeight="40dp"
+        android:layout_marginTop="85dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:scrollbars="vertical"
+        android:hint="@string/editTextInputPrompt"
+        android:background="@drawable/border"
+        style="@style/Widget.AppCompat.EditText"
+        android:minLines="4" />
 
     <android.support.v7.widget.RecyclerView
         android:layout_below="@id/translateEditText"

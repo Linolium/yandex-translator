@@ -1,5 +1,7 @@
 package com.github.linolium.yandex_translator.domain;
 
+import java.io.Serializable;
+
 import io.realm.Realm;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
@@ -14,7 +16,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class TranslateText extends RealmObject {
+public class TranslateText extends RealmObject implements Serializable {
     @PrimaryKey
     @Required
     private Integer id;

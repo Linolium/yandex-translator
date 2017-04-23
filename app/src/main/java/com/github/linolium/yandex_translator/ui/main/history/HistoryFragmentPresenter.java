@@ -4,6 +4,9 @@ import android.content.SharedPreferences;
 
 import com.github.linolium.yandex_translator.app.BaseFragmentPresenter;
 import com.github.linolium.yandex_translator.common.eventbus.Bus;
+import com.github.linolium.yandex_translator.domain.TranslateText;
+
+import java.util.List;
 
 import io.realm.Realm;
 import rx.Subscription;
@@ -15,4 +18,5 @@ import rx.Subscription;
 public interface HistoryFragmentPresenter extends BaseFragmentPresenter<HistoryFragmentView> {
     Subscription subscribeToBus(Bus bus, SharedPreferences preferences, Realm realm);
     void getHistoryTexts(Bus bus, Realm realm);
+    void clearHistory(Realm realm);
 }

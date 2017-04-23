@@ -15,4 +15,5 @@ import rx.Subscription;
 public interface DictionaryFragmentPresenter extends BaseFragmentPresenter<DictionaryFragmentView> {
     Subscription subscribeToBus(Bus bus, SharedPreferences preferences, Realm realm);
     void getSavedTexts(Bus bus, Realm realm);
+    void clearFavourite(Realm realm);
 }

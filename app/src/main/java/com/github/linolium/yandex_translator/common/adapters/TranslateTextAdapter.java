@@ -45,7 +45,14 @@ public class TranslateTextAdapter extends RecyclerView.Adapter<TranslateTextAdap
         //Отображаем данные
         holder.text.setText(translateText.getTranslatedText());
 
-        RxView.clicks(holder.getFavouriteButton()).subscribe(aVoid -> bus.send(new FavouriteEvent(translateText)));
+        RxView.clicks(holder.getFavouriteButton()).subscribe(aVoid -> {
+            bus.send(new FavouriteEvent(translateText));
+            holder.getFavouriteButton().setImageResource(R.drawable.ic_bookmark_black_24dp);
+        });
+    }
+
+    public TranslateText getItem(int position) {
+        return translateTextList.get(position);
     }
 
     private TranslateText getTranslateText(int position) {

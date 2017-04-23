@@ -7,4 +7,7 @@
     <string name="toast_successfully_added">Слово успешно добавлено в словарь</string>
     <string name="search_hint_favourite">Найти в избранном</string>
     <string name="search_hint_history">Найти в истории</string>
+    <string name="translateByYandex">Переведено яндекс переводчиком</string>
+    <string name="wordIsAlreadyExists">Это слово или предложение уже есть в избранном</string>
+    <string name="editTextInputPrompt">Введите текст</string>
 </resources>
