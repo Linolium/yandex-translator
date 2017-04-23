@@ -72,7 +72,7 @@ public class TranslatorFragmentPresenterImpl implements TranslatorFragmentPresen
                             TranslateText translateText = ((FavouriteEvent) event).getTranslateText();
                             if (transaction.where(TranslateText.class)
                                     .equalTo("enteredText", translateText.getEnteredText())
-                                    .equalTo("fromToCode", translateText.getFromToCode()).findFirst() == null) {
+                                    .equalTo("fromToCode", translateText.getFromToCode().toUpperCase()).findFirst() == null) {
                                 translateText.setId(TranslateText.getNextKey(realm));
                                 translateText.setFavourite(true);
                                 translateText.setFromToCode(translateText.getFromToCode().toUpperCase());
