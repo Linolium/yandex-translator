@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -86,7 +87,7 @@ public class TranslatorFragment extends BaseFragment implements TranslatorFragme
         realm = Realm.getDefaultInstance();
         presenter.init(this);
         eventSubscription = presenter.subscribeToBus(bus, preferences, realm);
-        presenter.loadLangs(networkService, bus, preferences);
+        presenter.loadLangs(networkService, bus, preferences, realm);
     }
 
     @Override
@@ -237,5 +238,17 @@ public class TranslatorFragment extends BaseFragment implements TranslatorFragme
     public void clearEditText() {
         enterTextArea.setText("");
         recyclerView.setAdapter(null);
+    }
+
+    @Override
+    public void showLangDialog() {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(activity)
+                .setTitle(R.string.error)
+                .setMessage(R.string.langError)
+                .setCancelable(false)
+                .setPositiveButton(R.string.repeat, (dialog, which) -> presenter.loadLangs(networkService, bus, preferences, realm));
+
+        AlertDialog dialog = dialogBuilder.create();
+        dialog.show();
     }
 }

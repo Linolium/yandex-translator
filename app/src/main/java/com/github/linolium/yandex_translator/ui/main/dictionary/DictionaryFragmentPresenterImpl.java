@@ -7,8 +7,7 @@ import com.github.linolium.yandex_translator.common.MessageType;
 import com.github.linolium.yandex_translator.common.eventbus.Bus;
 import com.github.linolium.yandex_translator.common.eventbus.events.HttpErrorEvent;
 import com.github.linolium.yandex_translator.common.eventbus.events.ThrowableEvent;
-import com.github.linolium.yandex_translator.common.eventbus.events.dictionary.DisplayFavouriteEvent;
-import com.github.linolium.yandex_translator.common.eventbus.events.translator.TranslateEvent;
+import com.github.linolium.yandex_translator.common.eventbus.events.dictionary.ShowClearDialogEvent;
 import com.github.linolium.yandex_translator.domain.TranslateText;
 
 import java.util.List;
@@ -46,6 +45,8 @@ public class DictionaryFragmentPresenterImpl implements DictionaryFragmentPresen
                         view.showMessage(R.string.toast_error, MessageType.ERROR);
                     } else if (event instanceof HttpErrorEvent) {
                         view.showMessage(R.string.toast_error, MessageType.ERROR);
+                    } else if (event instanceof ShowClearDialogEvent) {
+                        view.makeSingleDeleteDialog(((ShowClearDialogEvent) event).getTranslateText());
                     }
                 });
     }
@@ -64,11 +65,23 @@ public class DictionaryFragmentPresenterImpl implements DictionaryFragmentPresen
 
     @Override
     public void clearFavourite(Realm realm) {
+        view.showProgress();
         realm.executeTransaction(transaction -> {
             transaction.where(TranslateText.class)
                     .equalTo("isFavourite", true)
                     .findAll()
                     .deleteAllFromRealm();
+        });
+    }
+
+    @Override
+    public void clearSingleFavourite(Realm realm, TranslateText translateText) {
+        view.showProgress();
+        realm.executeTransaction(transaction -> {
+            transaction.where(TranslateText.class)
+                    .equalTo("id", translateText.getId())
+                    .findFirst()
+                    .deleteFromRealm();
         });
     }
 }

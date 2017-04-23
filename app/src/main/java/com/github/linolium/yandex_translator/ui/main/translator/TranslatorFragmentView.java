@@ -17,4 +17,5 @@ public interface TranslatorFragmentView {
     void updateSpinners(List<Lang> langs);
     void updateRecyclerView(List<TranslateText> textList);
     void clearEditText();
+    void showLangDialog();
 }

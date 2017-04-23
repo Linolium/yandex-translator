@@ -14,4 +14,6 @@ public interface DictionaryFragmentView {
     void hideProgress();
     void showMessage(int message, @MessageType int type);
     void getTranslatedTexts(List<TranslateText> translateTexts);
+    void makeAlertDialog();
+    void makeSingleDeleteDialog(TranslateText translateText);
 }

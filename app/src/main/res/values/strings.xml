@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">yandex-translator</string>
+    <string name="app_name_display">Переводчик</string>
     <string name="text_translate">Переводчик</string>
     <string name="text_dictionary">Избранное</string>
     <string name="text_history">История</string>
@@ -7,7 +8,18 @@
     <string name="toast_successfully_added">Слово успешно добавлено в словарь</string>
     <string name="search_hint_favourite">Найти в избранном</string>
     <string name="search_hint_history">Найти в истории</string>
-    <string name="translateByYandex">Переведено яндекс переводчиком</string>
+    <string name="translateByYandex">Переведено сервисом Яндекс Переводчик <a href="http://translate.yandex.ru/"> http://translate.yandex.ru/ </a></string>
     <string name="wordIsAlreadyExists">Это слово или предложение уже есть в избранном</string>
     <string name="editTextInputPrompt">Введите текст</string>
+    <string name="favourite">ИЗБРАННОЕ</string>
+    <string name="history">ИСТОРИЯ</string>
+    <string name="favouriteClearConfirm">Вы уверены что хотите очистить избранное?</string>
+    <string name="historyClearConfirm">Вы уверены что хотите очистить историю?</string>
+    <string name="singleClearConfirm">Вы уверены что хотите удалить этот текст?</string>
+    <string name="clearYes">Да</string>
+    <string name="clearNo">Отмена</string>
+    <string name="error">ОШИБКА</string>
+    <string name="langError">Не удается загрузить список языков, проверьте подключение к сети</string>
+    <string name="repeat">Попробовать снова</string>
+    <string name="splashText">Приложение для школы мобильной разработки \n Проект «Мобилизация»</string>
 </resources>

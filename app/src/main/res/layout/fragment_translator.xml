@@ -68,7 +68,7 @@
         android:hint="@string/editTextInputPrompt"
         android:background="@drawable/border"
         style="@style/Widget.AppCompat.EditText"
-        android:minLines="4" />
+        android:minLines="4"/>
 
     <android.support.v7.widget.RecyclerView
         android:layout_below="@id/translateEditText"

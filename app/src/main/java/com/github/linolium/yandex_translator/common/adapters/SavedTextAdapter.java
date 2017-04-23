@@ -5,13 +5,14 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.github.linolium.yandex_translator.R;
 import com.github.linolium.yandex_translator.common.TranslatedTextFilter;
 import com.github.linolium.yandex_translator.common.eventbus.Bus;
+import com.github.linolium.yandex_translator.common.eventbus.events.dictionary.ShowClearDialogEvent;
 import com.github.linolium.yandex_translator.domain.TranslateText;
+import com.jakewharton.rxbinding.view.RxView;
 
 import java.util.List;
 
@@ -48,6 +49,10 @@ public class SavedTextAdapter extends RecyclerView.Adapter<SavedTextAdapter.Item
         holder.enteredText.setText(translateText.getEnteredText());
         holder.translatedText.setText(translateText.getTranslatedText());
         holder.fromToCode.setText(translateText.getFromToCode());
+
+        RxView.longClicks(holder.itemView).subscribe(aVoid -> {
+            bus.send(new ShowClearDialogEvent(translateText));
+        });
     }
 
     public void setList(List<TranslateText> list) {

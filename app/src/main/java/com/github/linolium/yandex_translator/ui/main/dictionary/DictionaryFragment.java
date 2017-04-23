@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -93,7 +94,7 @@ public class DictionaryFragment extends BaseFragment implements DictionaryFragme
         searchView = (SearchView) view.findViewById(R.id.searchView);
         clearButton = (ImageButton) view.findViewById(R.id.clearButton);
         RxView.clicks(clearButton).subscribe(aVoid -> {
-            presenter.clearFavourite(realm);
+            makeAlertDialog();
         });
 
         // необходимо для смены цвета текста в searchView
@@ -145,5 +146,31 @@ public class DictionaryFragment extends BaseFragment implements DictionaryFragme
         savedTextAdapter = new SavedTextAdapter(translateTexts, activity, bus);
         recyclerView.setLayoutManager(new LinearLayoutManager(activity));
         recyclerView.setAdapter(savedTextAdapter);
+    }
+
+    @Override
+    public void makeAlertDialog() {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(activity)
+                .setTitle(R.string.favourite)
+                .setMessage(R.string.favouriteClearConfirm)
+                .setCancelable(true)
+                .setPositiveButton(R.string.clearYes, (dialog, which) -> presenter.clearFavourite(realm))
+                .setNegativeButton(R.string.clearNo, (dialog, which) -> {});
+
+        AlertDialog dialog = dialogBuilder.create();
+        dialog.show();
+    }
+
+    @Override
+    public void makeSingleDeleteDialog(TranslateText translateText) {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(activity)
+                .setTitle(R.string.favourite)
+                .setMessage(R.string.singleClearConfirm)
+                .setCancelable(true)
+                .setPositiveButton(R.string.clearYes, (dialog, which) -> presenter.clearSingleFavourite(realm, translateText))
+                .setNegativeButton(R.string.clearNo, (dialog, which) -> {});
+
+        AlertDialog dialog = dialogBuilder.create();
+        dialog.show();
     }
 }

@@ -17,7 +17,7 @@ import rx.Subscription;
 
 public interface TranslatorFragmentPresenter extends BaseFragmentPresenter<TranslatorFragmentView> {
     Subscription subscribeToBus(Bus bus, SharedPreferences preferences, Realm realm);
-    void loadLangs(NetworkService networkService, Bus bus, SharedPreferences preferences);
+    void loadLangs(NetworkService networkService, Bus bus, SharedPreferences preferences, Realm realm);
     void loadTranslatedList(NetworkService networkService, Bus bus, String lang, String text);
     void setDefaultLangs(String spinnerConfig, int pos, SharedPreferences preferences);
     void updateHistory(Bus bus, Realm realm, TranslateText translateText);

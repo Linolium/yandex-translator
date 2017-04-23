@@ -2,6 +2,8 @@ package com.github.linolium.yandex_translator.common.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -78,7 +80,11 @@ public class TranslateTextAdapter extends RecyclerView.Adapter<TranslateTextAdap
             super(itemView);
             text = (TextView) itemView.findViewById(R.id.text);
             favouriteButton = (ImageButton) itemView.findViewById(R.id.addToFavourite);
-            byYandex = (TextView) itemView.findViewById(R.id.byYandex);
+//            byYandex = (TextView) itemView.findViewById(R.id.byYandex);
+//            byYandex.setClickable(true);
+//            byYandex.setMovementMethod(LinkMovementMethod.getInstance());
+//            String yandexLink = "<a href='http://translate.yandex.ru/'>" + "переведено" + "</a>";
+//            byYandex.setText(Html.fromHtml(yandexLink));
         }
     }
 }

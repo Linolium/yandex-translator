@@ -7,6 +7,7 @@ import com.github.linolium.yandex_translator.common.MessageType;
 import com.github.linolium.yandex_translator.common.eventbus.Bus;
 import com.github.linolium.yandex_translator.common.eventbus.events.HttpErrorEvent;
 import com.github.linolium.yandex_translator.common.eventbus.events.ThrowableEvent;
+import com.github.linolium.yandex_translator.common.eventbus.events.dictionary.ShowClearDialogEvent;
 import com.github.linolium.yandex_translator.common.eventbus.events.history.DisplayHistoryEvent;
 import com.github.linolium.yandex_translator.domain.TranslateText;
 
@@ -46,6 +47,8 @@ public class HistoryFragmentPresenterImpl implements HistoryFragmentPresenter {
                         view.showMessage(R.string.toast_error, MessageType.ERROR);
                     } else if (event instanceof HttpErrorEvent) {
                         view.showMessage(R.string.toast_error, MessageType.ERROR);
+                    } else if (event instanceof ShowClearDialogEvent) {
+                        view.makeSingleDeleteDialog(((ShowClearDialogEvent) event).getTranslateText());
                     }
                 });
     }
@@ -69,6 +72,17 @@ public class HistoryFragmentPresenterImpl implements HistoryFragmentPresenter {
                     .equalTo("isFavourite", false)
                     .findAll()
                     .deleteAllFromRealm();
+        });
+    }
+
+    @Override
+    public void clearSingleHistory(Realm realm, TranslateText translateText) {
+        view.showProgress();
+        realm.executeTransaction(transaction -> {
+            transaction.where(TranslateText.class)
+                    .equalTo("id", translateText.getId())
+                    .findFirst()
+                    .deleteFromRealm();
         });
     }
 }

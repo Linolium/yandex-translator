@@ -89,18 +89,25 @@ public class TranslatorFragmentPresenterImpl implements TranslatorFragmentPresen
     }
 
     @Override
-    public void loadLangs(NetworkService networkService, Bus bus, SharedPreferences preferences) {
+    public void loadLangs(NetworkService networkService, Bus bus, SharedPreferences preferences, Realm realm) {
         view.showProgress();
         Observable<Response<LangResponse>> responseObservable = networkService.getLangs(Config.API_KEY, "ru");
         responseObservable.compose(RxUtil.applySchedulersAndRetry())
                 .subscribe(response -> {
-                   int responseCode = response.code();
+                    int responseCode = response.code();
                     if (responseCode == HttpURLConnection.HTTP_OK) {
                         LangResponse langResponse = response.body();
+
                         List<Lang> langList = new ArrayList<>();
                         for (Map.Entry<String, String> entry : langResponse.getLangs().entrySet()) {
                             langList.add(new Lang(entry.getKey(), entry.getValue()));
                         }
+
+                        // кэшируем предыдущий ответ
+                        realm.executeTransaction(transaction -> {
+                            transaction.delete(Lang.class);
+                            transaction.copyToRealm(langList);
+                        });
 
                         final int fromPosition = preferences.getInt(Config.FROM_LANG_POS, -1);
                         final int toPosition = preferences.getInt(Config.TO_LANG_POS, -1);
@@ -114,10 +121,19 @@ public class TranslatorFragmentPresenterImpl implements TranslatorFragmentPresen
                         bus.send(new LoadLangsEvent(langList));
                     }
                 }, throwable -> {
-                    throwable.printStackTrace();
-                    bus.send(new ThrowableEvent(throwable));
-                });
+                    // в случае ошибки достаем данные из кэша
+                    realm.where(Lang.class).findAll().asObservable()
+                            .first()
+                            .subscribe(result -> {
+                                List<Lang> langs = realm.copyFromRealm(result);
+                                if (langs.isEmpty()) {
+                                    view.showLangDialog();
+                                    return;
+                                }
+                                bus.send(new LoadLangsEvent(langs));
+                            });
 
+                });
     }
 
     @Override

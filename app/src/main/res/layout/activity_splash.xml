@@ -13,15 +13,10 @@
     tools:context="com.github.linolium.yandex_translator.ui.splash.SplashActivity"
     android:gravity="center">
 
-    <ImageView
-        android:id="@+id/fullscreen_content"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:src="@drawable/ic_history_black_24dp" />
-
     <TextView
-        android:text="Тестовое приложения для летней школы яндекса"
+        android:text="@string/splashText"
+        android:textSize="20sp"
+        android:textAlignment="center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"

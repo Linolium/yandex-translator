@@ -19,4 +19,5 @@ public interface HistoryFragmentPresenter extends BaseFragmentPresenter<HistoryF
     Subscription subscribeToBus(Bus bus, SharedPreferences preferences, Realm realm);
     void getHistoryTexts(Bus bus, Realm realm);
     void clearHistory(Realm realm);
+    void clearSingleHistory(Realm realm, TranslateText translateText);
 }

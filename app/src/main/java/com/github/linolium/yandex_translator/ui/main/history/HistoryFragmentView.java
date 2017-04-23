@@ -14,4 +14,6 @@ public interface HistoryFragmentView {
     void hideProgress();
     void showMessage(int message, @MessageType int type);
     void getHistoryTexts(List<TranslateText> translateTexts);
+    void makeAlertDialog();
+    void makeSingleDeleteDialog(TranslateText translateText);
 }

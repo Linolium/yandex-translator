@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -92,7 +93,7 @@ public class HistoryFragment extends BaseFragment implements HistoryFragmentView
         searchView = (SearchView) view.findViewById(R.id.searchView);
         clearButton = (ImageButton) view.findViewById(R.id.clearButton);
         RxView.clicks(clearButton).subscribe(aVoid -> {
-            presenter.clearHistory(realm);
+            makeAlertDialog();
         });
 
         // необходимо для смены цвета текста в searchView
@@ -120,6 +121,12 @@ public class HistoryFragment extends BaseFragment implements HistoryFragmentView
                 return false;
             }
         });
+
+        recyclerView.setOnLongClickListener(view1 ->  {
+            makeAlertDialog();
+            return true;
+        });
+
         return view;
     }
 
@@ -145,5 +152,29 @@ public class HistoryFragment extends BaseFragment implements HistoryFragmentView
         recyclerView.setAdapter(savedTextAdapter);
     }
 
+    @Override
+    public void makeAlertDialog() {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(activity)
+                .setTitle(R.string.history)
+                .setMessage(R.string.historyClearConfirm)
+                .setCancelable(true)
+                .setPositiveButton(R.string.clearYes, (dialog, which) -> presenter.clearHistory(realm))
+                .setNegativeButton(R.string.clearNo, (dialog, which) -> {});
 
+        AlertDialog dialog = dialogBuilder.create();
+        dialog.show();
+    }
+
+    @Override
+    public void makeSingleDeleteDialog(TranslateText translateText) {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(activity)
+                .setTitle(R.string.history)
+                .setMessage(R.string.singleClearConfirm)
+                .setCancelable(true)
+                .setPositiveButton(R.string.clearYes, (dialog, which) -> presenter.clearSingleHistory(realm, translateText))
+                .setNegativeButton(R.string.clearNo, (dialog, which) -> {});
+
+        AlertDialog dialog = dialogBuilder.create();
+        dialog.show();
+    }
 }
