@@ -21,7 +21,7 @@
             <android.support.v7.widget.AppCompatSpinner
                 android:id="@+id/from_lang"
                 style="@style/ThemeSpinner"
-                app:backgroundTint="@color/red"
+                app:backgroundTint="@color/colorAccent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
@@ -35,7 +35,7 @@
             <android.support.v7.widget.AppCompatSpinner
                 android:id="@+id/to_lang"
                 style="@style/ThemeSpinner"
-                app:backgroundTint="@color/red"
+                app:backgroundTint="@color/colorAccent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 

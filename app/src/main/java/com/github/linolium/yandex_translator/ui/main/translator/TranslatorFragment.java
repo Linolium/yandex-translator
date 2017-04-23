@@ -9,6 +9,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -61,11 +62,6 @@ public class TranslatorFragment extends BaseFragment implements TranslatorFragme
     private Spinner toLang;
     private EditText enterTextArea;
     private RecyclerView recyclerView;
-    private boolean isVerticalScreen;
-
-    private Observable<Boolean> isEmptyArea;
-    private CompositeSubscription subscriptions;
-
 
     @Inject
     TranslatorFragmentPresenter presenter;
@@ -116,6 +112,7 @@ public class TranslatorFragment extends BaseFragment implements TranslatorFragme
         switchLangButton = (ImageButton) view.findViewById(R.id.switchLangButton);
         toLang = (Spinner) view.findViewById(R.id.to_lang);
         enterTextArea = (EditText) view.findViewById(R.id.translateEditText);
+
 
         RxView.clicks(switchLangButton).subscribe(aVoid -> {
             int tempPos = fromLang.getSelectedItemPosition();
@@ -202,8 +199,6 @@ public class TranslatorFragment extends BaseFragment implements TranslatorFragme
 
             }
         });
-
-
         return view;
     }
 
